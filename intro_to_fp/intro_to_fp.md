@@ -289,17 +289,121 @@ True
 
 # Funktionale Programmierung in der Praxis
 
-## Everything is an expression
+## Übersicht
+
+Funktionale Programmierung in der Praxis bedeutet
+
+- Arbeiten mit Collections und Vermeidung von temporären Hilfsvariablen
+
+. . .
+
+_Beispiel_
+
+Vergleiche folgenden idiomatischen Haskell Code
+
+```haskell
+let s  = foldr (+) 0 [1..10]
+let s2 = sum [1..10] -- even shorter
+```
+
+. . .
+
+mit dem entsprechenden idiomatischen C++ Code
+
+```cpp
+int a[] = {1,2,3,4,5,6,7,8,9,10};
+int i,s,l;
+s = 0;
+l = sizeof(a) / sizeof(*a);
+for(i=0; i<l; i++)
+{
+    s += a[i];
+}
+```
+
+## Übersicht
+
+Funktionale Programmierung in der Praxis bedeutet
+
+> - Arbeiten mit Collections und Vermeidung von temporären Hilfsvariablen
+> - Alles ist ein Ausdruck
+
+## Alles ein Ausdruck
+
+Funktionale Programmierung mag manchmal befremdlich erscheinen für alle die die
+bereits eine "konventionelle" Sprache beherrschen. Dies liegt daran das vieles
+anders gemacht wird/werden muss.
+
+. . .
+
+Ein Beispiel ist die Tatsache, dass es in der funktionalen Programmierung keine
+Anweisungen gibt, alles besteht aus Ausdrücken. Die Anwendung selbst ist ein
+einziger Ausdruck bestehend aus vielen (möglicherweise rekursiven)
+Sub-Ausdrücken.
+
+. . .
+
+**Ein Ausdruck hat immer einen Rückgabewert**
 
 ## if/else
 
-## Schleifen
+Alles muss ein Ausdruck sein, das gilt auch für if/else Konstrukte. Als
+Konsequenz darf es kein if ohne else geben.
 
-## Tail Call Optimization (TOC)
+. . .
+
+**Grund:** Für jeden möglichen Eingabewert muss es einen Rückgabewert geben, denn
+ein Ausdruck kann immer einer Variablen zugewiesen werden.
+
+. . .
+
+Aus dem selben Grund müssen beide if-Zweige auch den gleichen Datetyp zurück
+geben!
+
+. . .
+
+_Beispiel_
+
+Python besitzt eine funktionale (einzeilige) Version von if/else um einer
+Variablen einen Wert zuzuweisen. In diesem Fall muss immer ein else-Zweig
+vorhanden sein
+
+```python
+>>> x = 42
+>>> y = 5 if x > 0
+  File "<stdin>", line 1
+    y = 5 if x > 0
+                 ^
+SyntaxError: invalid syntax
+>>> y = 5 if x > 0 else -1
+>>> y
+5
+```
+
+## if/else
+
+In Haskell kann sich die Zuweisung über mehrere Zeilen strecken. Aber auch hier
+müssen alle möglichen Pfade den gleichen Rückgabetyp besitzen.
+
+```haskell
+-- Simple echo application
+main = do
+  l <- getLine
+  if l == "quit"
+  -- main always has type IO (), so we have to return the singelton value ()
+  then return ()
+  -- the return value can be arbitrarily complex, event recursive, but the
+  -- overall type has to be IO ()
+  else do
+    putStrLn l
+    main
+```
+
+## Explizite Funktionsparameter
+
+## Rekursion und Tail Call Optimization (TOC)
 
 ## Komposition
-
-## Idiome
 
 # Beispiele
 
