@@ -57,6 +57,19 @@ parseDay = do
   return $ fromGregorian (read y) (read mm) (read d)
 
 
+parseTime :: Parser TimeOfDay
+parseTime = undefined
+
+parseProduct :: Parser Product
+parseProduct = undefined
+
+parseLogEntry :: Parser LogEntry
+parseLogEntry = undefined
+
+parseLog :: Parser Log
+parseLog = undefined
+
+
 ip  = "127.0.0.1"
 day = "2013-06-29"
 

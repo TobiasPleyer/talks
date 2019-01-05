@@ -34,6 +34,24 @@ data LogEntry = LogEntry
 
 type Log = [LogEntry]
 
+parseIP :: Parser IP
+parseIP = undefined
+
+parseDay :: Parser Day
+parseDay = undefined
+
+parseTime :: Parser TimeOfDay
+parseTime = undefined
+
+parseProduct :: Parser Product
+parseProduct = undefined
+
+parseLogEntry :: Parser LogEntry
+parseLogEntry = undefined
+
+parseLog :: Parser Log
+parseLog = undefined
+
 
 main :: IO ()
 main = return ()

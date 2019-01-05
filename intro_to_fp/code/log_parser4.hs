@@ -75,6 +75,13 @@ parseProduct =
  <|> (string "speakers" >> (return $ show Speakers))
 
 
+parseLogEntry :: Parser LogEntry
+parseLogEntry = undefined
+
+parseLog :: Parser Log
+parseLog = undefined
+
+
 ip   = "127.0.0.1"
 day  = "2013-06-29"
 time = "12:52:17"

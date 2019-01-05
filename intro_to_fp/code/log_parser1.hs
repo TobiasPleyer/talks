@@ -47,6 +47,22 @@ parseIP = do
   return $ IP d1 d2 d3 d4
 
 
+parseDay :: Parser Day
+parseDay = undefined
+
+parseTime :: Parser TimeOfDay
+parseTime = undefined
+
+parseProduct :: Parser Product
+parseProduct = undefined
+
+parseLogEntry :: Parser LogEntry
+parseLogEntry = undefined
+
+parseLog :: Parser Log
+parseLog = undefined
+
+
 ip = BC.pack "127.0.0.1"
 
 

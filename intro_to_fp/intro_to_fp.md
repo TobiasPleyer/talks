@@ -11,7 +11,7 @@ patat:
 
 > 1. Grundlagen
 > 2. Haskell Schnellkurs
-> 3. Konzepte
+> 3. Wichtige Konzepte
 > 4. Funktionale Programmierung in der Praxis
 > 5. Warum funktionale Programmierung?
 > 6. Beispiele & Demos
@@ -102,20 +102,33 @@ _Beispiele_
 
 - Die gesamte Syntax von Haskell ist darauf ausgelegt das Arbeiten mit
   Funktionen so einfach und knapp wie möglich zu machen
-- In Haskell werden Funktionen ohne Klammern aufgerufen: `f x y z`
-- Lambda-Funktionen in Haskell schreiben sich so: `\x y -> x + y` Zwischen
-  Backslash und Pfeil stehen die Argumente und der Funktionskörper folgt nach
-  dem Pfeil
-- Jede Funktion in Haskell hat immer einen Datentyp, die sog. Signatur der
-  Funktion, welche aber in der Regel nicht mit angegeben werden muss sondern
-  nur optional ist
+- In Haskell werden _Funktionen ohne Klammern_ aufgerufen: `f x y z`
+  **Vorsicht:** `f(x,y,z) == f (x,y,z) == Funktion mit einem Tuple-Parameter`
+- Lambda-Funktionen in Haskell schreiben sich so: `\x y -> x + y`
+  Zwischen Backslash und Pfeil stehen die Argumente und der Funktionskörper
+  folgt nach dem Pfeil
+- Jede Funktion in Haskell hat immer einen Datentyp, die sog. _Signatur der
+  Funktion_, welche aber üblicherweise nicht mit angegeben werden muss sondern
+  optional ist, weil der Compiler diese i.d.R. selbst ableiten kann
   Schreibweise: `myFunction :: String -> Int -> String`
-- Funktionen welche Seiteneffekte haben können haben immer einen
-  Rückgabewert von `IO`
+- _Funktionen mit Seiteneffekten_ haftet immer ein Rückgabetyp von `IO` an
   Beispiel: `getLine :: IO String`
+  Damit wird die Funktion über das Typesystem als impure, also mit
+  Seiteneffekten markiert
+- In Haskell gibt es die sog. _do-notation_. Do-notation ist nur _syntactic sugar_
+  um Code prägnant und leserlich sequentiell auszuführen. Der Code wirkt dem
+  Anschein nach imperativ, ist aber in der Tat vollkommen funktional
 
+  . . .
 
-# Konzepte
+  ```haskell
+  main = do                      main = (
+    line <- getLine                getLine >>= (\line ->
+    let rev = reverse line   =>    return (reverse line) >>= (\rev ->
+    putStrLn rev                   putStrLn rev)))
+  ```
+
+# Wichtige Konzepte
 
 ## Anmerkung
 
@@ -171,6 +184,8 @@ data List a = Nil
 data Tree a = Empty
             | Leaf a
             | Node (Tree a) (Tree a)
+
+tree = Node (Node (Leaf 1) (Leaf 2)) (Leaf 3)
 ```
 
 ## Algebraic Data Types (ADT)
@@ -423,8 +438,7 @@ _Beispiel_
 Vergleiche folgenden idiomatischen Haskell Code
 
 ```haskell
-let s  = foldr (+) 0 [1..10]
-let s2 = sum [1..10] -- even shorter
+let s = foldr (+) 0 [1..10]
 ```
 
 . . .
@@ -490,14 +504,14 @@ vorhanden sein
 
 ```python
 >>> x = 42
+>>> y = 5 if x > 0 else -1
+>>> y
+5
 >>> y = 5 if x > 0
   File "<stdin>", line 1
     y = 5 if x > 0
                  ^
 SyntaxError: invalid syntax
->>> y = 5 if x > 0 else -1
->>> y
-5
 ```
 
 ## Übersicht
@@ -601,7 +615,7 @@ Funktionale Programmierung in der Praxis bedeutet
 _Beispiel_
 
 ```haskell
--- REPL in Haskell
+-- Simple REPL in Haskell
 main = do
   line <- getLine
   result <- evaluate line
@@ -648,6 +662,14 @@ let new_func x = f3 (f2 (f1 x))
 let new_func = f3 . f2 . f1
 ```
 
+. . .
+
+Dies entspricht einer inversen Pipeline in einer UNIX Shell
+
+```bash
+~$ echo x | f1 | f2 | f3
+```
+
 ## Komposition und Point-Free-Style
 
 **Point-Free-Style:** Die Funktionsargumente werden nicht explizit mit
@@ -661,7 +683,7 @@ angegeben, wenn diese unmissverständlich aus dem Zusammenhang hervorgehen
 
 _Beispiel_
 
-Dieser Code stammt aus einem echten HTML Parser den ich geschrieben habe
+Dieser Code stammt von einem HTML-Parser den ich geschrieben habe
 
 ```haskell
 ingredients = ( map (T.unpack . T.unwords . map fromTagText . filter isTagText)
@@ -674,10 +696,90 @@ ingredients = ( map (T.unpack . T.unwords . map fromTagText . filter isTagText)
               . dropWhile (~/= "<table class=incredients>")) tags
 ```
 
-Der Code muss wie bei einem Stack von Unten nach Oben gelesen werden.
+Der Code wird von Unten nach Oben ausgeführt, und das jeweilige Ergebnis an die
+nächste Funktion weitergerecht.
 
 Quelle:
 *https://github.com/TobiasPleyer/chefkoch/blob/master/src/Chefkoch/Html/Parser.hs*
+
+## Übersicht
+
+Funktionale Programmierung in der Praxis bedeutet
+
+> - Arbeiten mit Collections und Vermeidung von temporären Hilfsvariablen
+> - Alles ist ein Ausdruck
+> - Keine impliziten oder versteckten Abhängigkeiten
+> - Rekursion
+> - Komposition
+> - Totale Funktionen
+
+. . .
+
+_Beispiel_
+
+Werfen wir einen Blick auf die folgende Funktion in C++
+
+```cpp
+double inverse (int x)
+{
+    return 1.0/x;
+}
+```
+
+. . .
+
+Die Signatur der Funktion, `inverse :: Int -> Double`, ist eine Lüge, denn sie
+besagt
+
+. . .
+
+    Gib mir eine beliebige Integervariable und ich gebe dir einen Doublewert
+    zurück
+
+. . .
+
+**Aber:** Die Funktion ist für `0` nicht definiert.
+
+. . .
+
+**Ich kann also nicht jeden beliebigen Wert übergeben!**
+
+. . .
+
+**Die Signatur ist irreführend!**
+
+. . .
+
+Funktionen dieser Art nennt man partielle Funktionen, weil sie nur eine
+Teilmenge der möglichen Argumente auf ein Element der Zielmenge abbilden.
+
+    Partielle Funktionen können zu bösen Bugs und Abstürzen führen, weil man
+    sich nur auf den Gut-Fall konzentriert und den Schlecht-Fall übersieht
+
+. . .
+
+*Wir möchten totale Funktionen haben*
+
+    Eine totale Funktion bildet jedes Element der Startmenge auf ein Element
+    der Zielmenge ab.
+
+. . .
+
+*Wie können wir das bei obigem Beispiel erreichen?*
+
+Es gibt zwei Möglichkeiten
+
+- Die Startmenge auf gültige Werte verkleinern
+- Die Zielmenge entsprechend erweitern
+
+. . .
+
+*Beispiel in Haskell*
+
+```haskell
+inverse_v1 :: PositiveInt -> Double
+inverse_v2 :: Int -> Maybe Double
+```
 
 # Warum funktionale Programmierung?
 
@@ -685,7 +787,7 @@ Quelle:
 
 - Wartbarkeit
 - Testbarkeit
-- Extrem Ausdrucksstark
+- Extrem ausdrucksstark
 - Schließt eine Vielzahl von üblichen Fehlern aus
 - Anerkannte Design-Patterns ergeben sich auf natürliche Weise
 
@@ -701,10 +803,10 @@ Quelle:
 
 _Problemstellung_
 
-    Write a program that prints the numbers from 1 to 100. But for multiples of
-    three print “Fizz” instead of the number and for the multiples of five
-    print “Buzz”. For numbers which are multiples of both three and five print
-    “FizzBuzz “.
+    Schreibe ein Programm welches die Zahlen von 1 bis 100 ausgibt. Aber für
+    Vielfache von drei soll das Programm stattdessen "Fizz" ausgeben und für
+    Vielfache von fünf "Buzz". Ist die Zahl ein Vielfaches von drei und fünf
+    soll "FizzBuzz" ausgegeben werden.
 
 . . .
 
@@ -718,9 +820,9 @@ import Data.Foldable (traverse_)
 
 showValue :: Int -> String
 showValue i
+    | i `mod` 15 == 0 = "FizzBuzz"
     | i `mod`  3 == 0 = "Fizz"
     | i `mod`  5 == 0 = "Buzz"
-    | i `mod` 15 == 0 = "FizzBuzz"
     | otherwise       = show i
 
 main = do
@@ -729,8 +831,35 @@ main = do
 
 ## Parsen von Logdateien
 
-## HTML Parser
+_Problemstellung_
 
-## Einfacher Webserver
+    Wir betreiben einen Webshop für Computerartikel. Auf unserem Server wird
+    geloggt immer wenn ein Kunde etwas kauft. Es werden geloggt: Datum,
+    Uhrzeit, IP-Adresse des Kunden und gekauftes Produkt. Pro Kauf wird eine
+    Zeile geloggt. Die Felder sind über Leerzeichen getrennt. Schreibe einen
+    Parser für eine solche Logdatei.
+
+*Beispielhafte Logdatei*
+
+```
+2013-06-29 11:16:23 124.67.34.60 keyboard
+2013-06-29 11:32:12 212.141.23.67 mouse
+2013-06-29 11:33:08 212.141.23.67 monitor
+2013-06-29 12:12:34 125.80.32.31 speakers
+2013-06-29 12:51:50 101.40.50.62 keyboard
+2013-06-29 13:10:45 103.29.60.13 mouse
+```
+
+. . .
+
+*Vorgehen*
+
+0. Definiere die Domäne und die Tests
+1. Schreibe einen Parser für die IP-Adresse
+2. Schreibe einen Parser für das Datum
+3. Schreibe einen Parser für die Uhrzeit
+4. Schreibe einen Parser für den Artikel
+5. Konstruiere einen Parser für eine Zeile des Logs
+6. Konstruiere einen Parser für die gesamte Datei
 
 ## Monadic Computations mit Python
