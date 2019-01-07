@@ -13,7 +13,7 @@ import Data.Word
 import Data.Time hiding (parseTime)
 import Data.Attoparsec.ByteString.Char8
 import Control.Applicative
-import Control.Monad
+import Control.Monad (forM_)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 
@@ -93,7 +93,7 @@ parseLog = many $ parseLogEntry <* endOfLine
 
 main :: IO ()
 main = do
-  let logFile = "yesterday.log"
+  let logFile = "example.log"
   log_content <- B.readFile logFile
   let parse_result = parseOnly parseLog log_content
   case parse_result of
