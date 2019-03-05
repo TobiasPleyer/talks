@@ -781,10 +781,105 @@ inverse_v1 :: PositiveInt -> Double
 inverse_v2 :: Int -> Maybe Double
 ```
 
+## Übersicht
+
+Funktionale Programmierung in der Praxis bedeutet
+
+> - Arbeiten mit Collections und Vermeidung von temporären Hilfsvariablen
+> - Alles ist ein Ausdruck
+> - Keine impliziten oder versteckten Abhängigkeiten
+> - Rekursion
+> - Komposition
+> - Totale Funktionen
+> - Equational reasoning
+
+. . .
+
+Equational reasoning bedeutet, dass wir Code sicher umschreiben können, ohne
+das Verhalten zu ändern.
+
+. . .
+
+_Beispiel_
+
+Wenn wir die folgende Haskell Funktion haben
+
+```haskell
+func :: a -> a
+func x = x + x
+```
+
+. . .
+
+dann wissen, dass wir die Funktion auch so hätten schreiben können:
+
+```haskell
+func :: a -> a
+func x = 2 * x
+```
+
+. . .
+
+
+```haskell
+func (sum [1..5]) == 30
+```
+
+. . .
+
+Dies ist nur möglich weil uns die Signatur der Funktion sagt, dass wir keine
+Seiteneffekte haben. In Programmiersprachen die solche Invarianzen nicht über
+das Typsystem garantieren können wir solche Annahmen nicht machen!
+
+. . .
+
+_Gegenbeispiel in Python_
+
+```python
+some_var = 0
+
+def g():
+    some_var += 1
+    return 15
+
+def f1(g):
+    return g() + g()
+
+def f2(g):
+    return 2 * g()
+```
+
+Die Funktionen *f1* und *f2* sind nicht identisch und haben auf den umgebenden
+Kontext nicht die gleiche Wirkung, obwohl ihr Rückgabewert immer gleich ist!
+
+## Übersicht
+
+Funktionale Programmierung in der Praxis bedeutet
+
+> - Arbeiten mit Collections und Vermeidung von temporären Hilfsvariablen
+> - Alles ist ein Ausdruck
+> - Keine impliziten oder versteckten Abhängigkeiten
+> - Rekursion
+> - Komposition
+> - Totale Funktionen
+> - Equational reasoning
+> - Local reasoning
+
+. . .
+
+Local reasoning bedeutet dass wir in der Lage sind Code in Isolation zu
+verstehen ohne Kenntnis des restlichen Codes.
+
+. . .
+
+    Local und equational reasoning versetzen uns in die Lage wartbaren und
+	wiederverwendbaren Code zu schreiben!
+
 # Warum funktionale Programmierung?
 
 ## Vorteile
 
+- Equational and local reasoning
 - Wartbarkeit
 - Testbarkeit
 - Extrem ausdrucksstark
@@ -798,6 +893,23 @@ inverse_v2 :: Int -> Maybe Double
 - Abstraktionen und zusätzliche Sicherheiten verringern Performanz
 
 # Beispiele
+
+## Beispiele aus der echten Welt
+
+- Pandoc - Document Converter (https://pandoc.org/)
+- Cardano - Blockchain Technology (https://iohk.io/projects/cardano/)
+- Yesod - Web Framework (https://www.yesodweb.com/)
+- Nix - Package Manager (https://nixos.org/)
+- Leksah - IDE (http://leksah.org/)
+- GHC - Glasgow Haskell Compiler (https://www.haskell.org/ghc/)
+- Attoparsec - Parser Combinators (http://hackage.haskell.org/package/attoparsec)
+- Reflex-frp - Functional Reactive Programming (https://reflex-frp.org/)
+
+## Funktionale Einflüsse in traditionellen OO-Sprachen
+
+- underscorejs (https://underscorejs.org/)
+- functools Python module (https://docs.python.org/3.6/library/functools.html)
+- Lambdas in C++11 (https://en.cppreference.com/w/cpp/language/lambda)
 
 ## FizzBuzz Kata
 
