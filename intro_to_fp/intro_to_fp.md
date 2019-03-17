@@ -188,7 +188,7 @@ data Tree a = Empty
 tree = Node (Node (Leaf 1) (Leaf 2)) (Leaf 3)
 ```
 
-## Algebraic Data Types (ADT)
+## Pattern Matching
 
 Algebraische Datentypen erlauben Pattern-Matching
 
@@ -220,6 +220,42 @@ List.tryFind predicate list
 
     Returns the first element for which the given function returns true.
     Returns None if no such element exists.
+
+## Pattern Matching
+
+*Warum ist Pattern Matching nützlich?*
+
+1. Man spart sich explizite getter Funktionen
+2. Es liest sich viel deutlicher mit was man es zu tun hat
+3. Fehlerwerte müssen explizit abgehandelt werden
+
+. . .
+
+Beispiel
+
+```cpp
+int main() {
+    // This function can fail! --> nullptr
+    DbHandler* handler = readFromDb("test.db")
+    // nullptr is also a DbHandler*
+    makeStatistics(handler)
+    // maybe segfault, exceptions, etc...
+}
+```
+
+. . .
+
+
+```haskell
+main = do
+    -- This function returns an Either String Handler value
+    eHandler <- readFromDb "test.db"
+    -- Either String Handler != Handler -> we are forced to pattern match
+    case eHandler of
+      Left err -> print err
+      Right handler -> makeStatistics handler  -- valid
+}
+```
 
 ## Lazy Evaluation
 
@@ -318,12 +354,12 @@ True
 
 ## Currying
 
-Warum ist Currying nützlich?
+*Warum ist Currying nützlich?*
+
+. . .
 
 Nehmen wir an wir haben folgende Funktion, welche die Daten eines Kunden
 bearbeitet und die veränderten Daten anschließend abspeichern möchte.
-
-. . .
 
 ```haskell
 changeCustomerData :: (Customer -> IO ()) -> Customer -> IO ()
@@ -346,7 +382,7 @@ Nehmen wir nun an die folgenden Funktionen sind ebenfalls definiert
 ```haskell
 saveCustomerDb    :: DbConn -> Customer -> IO ()
 saveCustomerFile  :: FilePath -> Customer -> IO ()
-saveCustomerCloud :: String -> String -> String -> Customer -> IO ()
+saveCustomerCloud :: Url -> Username -> Password -> Customer -> IO ()
 ```
 
 . . .
@@ -372,7 +408,7 @@ saveCustomer3 = saveCustomerCloud url username password
 
 Jede der Funktionen `saveCustomerX` hat die Signatur `Customer -> IO ()`.
 Weil wir die Funktionsparameter der Funktionen nur partiell anwenden entstehen
-neue Funktionen welche alle die **gleiche Signatur** besitzen und somit das **gleichen
+neue Funktionen welche alle die **gleiche Signatur** besitzen und somit das **gleiche
 Interface** bedienen können!
 
 . . .
@@ -697,7 +733,7 @@ ingredients = ( map (T.unpack . T.unwords . map fromTagText . filter isTagText)
 ```
 
 Der Code wird von Unten nach Oben ausgeführt, und das jeweilige Ergebnis an die
-nächste Funktion weitergerecht.
+nächste Funktion weitergereicht.
 
 Quelle:
 *https://github.com/TobiasPleyer/chefkoch/blob/master/src/Chefkoch/Html/Parser.hs*
@@ -742,7 +778,7 @@ besagt
 
 . . .
 
-**Ich kann also nicht jeden beliebigen Wert übergeben!**
+**Ich kann also nicht jeden beliebigen int Wert übergeben!**
 
 . . .
 
@@ -760,8 +796,8 @@ Teilmenge der möglichen Argumente auf ein Element der Zielmenge abbilden.
 
 *Wir möchten totale Funktionen haben*
 
-    Eine totale Funktion bildet jedes Element der Startmenge auf ein Element
-    der Zielmenge ab.
+    Eine totale Funktion bildet jedes Element der Domäne auf ein Element
+    der Codomäne ab.
 
 . . .
 
@@ -777,7 +813,7 @@ Es gibt zwei Möglichkeiten
 *Beispiel in Haskell*
 
 ```haskell
-inverse_v1 :: PositiveInt -> Double
+inverse_v1 :: NonNullInt -> Double
 inverse_v2 :: Int -> Maybe Double
 ```
 
@@ -827,8 +863,8 @@ func (sum [1..5]) == 30
 
 . . .
 
-Dies ist nur möglich weil uns die Signatur der Funktion sagt, dass wir keine
-Seiteneffekte haben. In Programmiersprachen die solche Invarianzen nicht über
+Dies ist **nur möglich** weil uns die Signatur der Funktion sagt, dass wir **keine
+Seiteneffekte** haben. In Programmiersprachen die solche Invarianzen nicht über
 das Typsystem garantieren können wir solche Annahmen nicht machen!
 
 . . .
@@ -838,19 +874,20 @@ _Gegenbeispiel in Python_
 ```python
 some_var = 0
 
-def g():
+def my_sum(nums):
     some_var += 1
-    return 15
+    return sum(nums)
 
-def f1(g):
-    return g() + g()
+def func1(g):
+    return my_sum([1,2,3]) + my_sum([1,2,3])
 
-def f2(g):
-    return 2 * g()
+def func2(g):
+    return 2 * my_sum([1,2,3])
 ```
 
-Die Funktionen *f1* und *f2* sind nicht identisch und haben auf den umgebenden
-Kontext nicht die gleiche Wirkung, obwohl ihr Rückgabewert immer gleich ist!
+Die Funktionen *func1* und *func2* haben zwar den gleichen Rückgabewert, wirken
+sich aber auf den umgebenden Kontext anders aus und können deshalb auch nicht
+als equivalent betrachtet werden!
 
 ## Übersicht
 
@@ -891,10 +928,11 @@ verstehen ohne Kenntnis des restlichen Codes.
 - Verlangt Umdenken
 - Weniger Leute auf dem Markt
 - Abstraktionen und zusätzliche Sicherheiten verringern Performanz
+- Operatoren-Wahnsinn
 
 # Beispiele
 
-## Beispiele aus der echten Welt
+## Erfolgreiche Projekte aus der echten Welt
 
 - Pandoc - Document Converter (https://pandoc.org/)
 - Cardano - Blockchain Technology (https://iohk.io/projects/cardano/)
@@ -974,4 +1012,10 @@ _Problemstellung_
 5. Konstruiere einen Parser für eine Zeile des Logs
 6. Konstruiere einen Parser für die gesamte Datei
 
+. . .
+
+**Live Coding soweit wir kommen, den Rest dann in der zweiten Session.**
+
 ## Monadic Computations mit Python
+
+**Live Coding in der zweiten Session**
