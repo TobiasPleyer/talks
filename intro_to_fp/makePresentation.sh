@@ -10,6 +10,8 @@ function usage {
     echo "    slidy"
     echo "    slidy2"
     echo "    slideous"
+    echo "    revealjs"
+    echo "    dzslides"
 }
 
 function render {
@@ -18,13 +20,19 @@ function render {
   renderer=$3
   case "$renderer" in
     slidy)
-      pandoc --self-contained -s -t slidy -V slidy-url=Slidy -o $dst $src
+      pandoc --self-contained -i -s -t slidy -V slidy-url=Slidy -o $dst $src
       ;;
     slidy2)
-      pandoc --self-contained -s -t slidy -V slidy-url=Slidy2 -o $dst $src
+      pandoc --self-contained -i -s -t slidy -V slidy-url=Slidy2 -o $dst $src
       ;;
     slideous)
-      pandoc --self-contained -s -t slidy -V slideous-url=slideous -o $dst $src
+      pandoc --self-contained -i -s -t slidy -V slideous-url=slideous -o $dst $src
+      ;;
+    revealjs)
+      pandoc --self-contained -i -s -t revealjs -V revealjs-url=reveal.js -V theme=solarized -o $dst $src
+      ;;
+    dzslides)
+      pandoc --self-contained -i -s -t dzslides -o $dst $src
       ;;
     *)
       echo "Unknown command"
