@@ -10,6 +10,7 @@
 
 {-# LANGUAGE OverloadedStrings #-}
 
+import Data.Char (isAlpha, toLower)
 import Data.Word
 import Data.Time hiding (parseTime)
 import Data.Attoparsec.ByteString.Char8
@@ -78,11 +79,14 @@ parseTime = do
 
 
 parseProduct :: Parser Product
-parseProduct =
-     (string "mouse"    >> return Mouse)
- <|> (string "keyboard" >> return Keyboard)
- <|> (string "monitor"  >> return Monitor)
- <|> (string "speakers" >> return Speakers)
+parseProduct = do
+  product <- map toLower <$> many (satisfy isAlpha)
+  case product of
+    "mouse" -> return Mouse
+    "keyboard" -> return Keyboard
+    "monitor" -> return Monitor
+    "speakers" -> return Speakers
+    _ -> fail ("Unknown product " ++ product)
 
 
 parseLogEntry :: Parser LogEntry
