@@ -1,7 +1,7 @@
 #!/usr/bin/env stack
 {- stack
   script
-  --resolver lts-11.8
+  --resolver lts-13.8
   --package attoparsec
   --package bytestring
   --package time

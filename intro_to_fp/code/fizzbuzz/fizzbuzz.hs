@@ -1,5 +1,5 @@
 #!/usr/bin/env stack
-{- stack script --resolver lts-11.8 --package base -}
+{- stack script --resolver lts-13.8 --package base -}
 
 import Data.Foldable (traverse_)
 

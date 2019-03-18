@@ -1,7 +1,7 @@
 #!/usr/bin/env stack
 {- stack
   script
-  --resolver lts-11.8
+  --resolver lts-13.8
   --package attoparsec
   --package bytestring
   --package time
@@ -13,7 +13,7 @@ import Data.Word
 import Data.Time hiding (parseTime)
 import Data.Attoparsec.ByteString.Char8
 import Control.Applicative
-import Control.Monad (forM_)
+import Control.Monad
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 
@@ -35,7 +35,7 @@ data LogEntry = LogEntry
 type Log = [LogEntry]
 
 
-parseIP :: Parser IP
+--parseIP :: Parser IP
 parseIP = do
   d1 <- decimal
   char '.'
@@ -44,58 +44,61 @@ parseIP = do
   d3 <- decimal
   char '.'
   d4 <- decimal
-  return $ IP d1 d2 d3 d4
+  return $ show $ IP d1 d2 d3 d4
 
 
-parseDay :: Parser Day
+--parseDay :: Parser Day
 parseDay = do
   y  <- count 4 digit
   char '-'
   mm <- count 2 digit
   char '-'
   d  <- count 2 digit
-  return $ fromGregorian (read y) (read mm) (read d)
+  return $ show $ fromGregorian (read y) (read mm) (read d)
 
 
-parseTime :: Parser TimeOfDay
+--parseTime :: Parser TimeOfDay
 parseTime = do
   h  <- count 2 digit
   char ':'
   m  <- count 2 digit
   char ':'
   s  <- count 2 digit
-  return $ TimeOfDay (read h) (read m) (read s)
+  return $ show $ TimeOfDay (read h) (read m) (read s)
 
 
-parseProduct :: Parser Product
+--parseProduct :: Parser Product
 parseProduct =
-     (string "mouse"    >> return Mouse)
- <|> (string "keyboard" >> return Keyboard)
- <|> (string "monitor"  >> return Monitor)
- <|> (string "speakers" >> return Speakers)
+     (string "mouse"    >> (return $ show Mouse))
+ <|> (string "keyboard" >> (return $ show Keyboard))
+ <|> (string "monitor"  >> (return $ show Monitor))
+ <|> (string "speakers" >> (return $ show Speakers))
 
 
 parseLogEntry :: Parser LogEntry
-parseLogEntry = do
-  d <- parseDay
-  char ' '
-  t <- parseTime
-  char ' '
-  ip <- parseIP
-  char ' '
-  p <- parseProduct
-  return $ LogEntry (LocalTime d t) ip p
-
+parseLogEntry = undefined
 
 parseLog :: Parser Log
-parseLog = many $ parseLogEntry <* endOfLine
+parseLog = undefined
 
+
+ip   = "127.0.0.1"
+day  = "2013-06-29"
+time = "12:52:17"
+prod = "monitor"
+
+
+testParser (p,bs) = do
+  let parse_result = parseOnly p bs
+  case parse_result of
+    Left err -> print err
+    Right res -> putStrLn res
 
 main :: IO ()
 main = do
-  let logFile = "example.log"
-  log_content <- B.readFile logFile
-  let parse_result = parseOnly parseLog log_content
-  case parse_result of
-    Left err -> print err
-    Right logs -> forM_ logs print
+  let testPairs = [ (parseIP, ip)
+                  , (parseDay, day)
+                  , (parseTime, time)
+                  , (parseProduct, prod)
+                  ]
+  forM_ testPairs testParser

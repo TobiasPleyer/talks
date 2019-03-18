@@ -1,7 +1,7 @@
 #!/usr/bin/env stack
 {- stack
   script
-  --resolver lts-11.8
+  --resolver lts-13.8
   --package attoparsec
   --package base
   --package bytestring
@@ -48,14 +48,8 @@ word8 = do
 
 parseIP :: Parser IP
 parseIP = do
-  d1 <- word8
-  char '.'
-  d2 <- word8
-  char '.'
-  d3 <- word8
-  char '.'
-  d4 <- word8
-  return $ IP d1 d2 d3 d4
+  let word8_ = char '.' *> word8
+  IP <$> word8 <*> word8_ <*> word8_ <*> word8_
 
 
 parseDay :: Parser Day

@@ -20,16 +20,16 @@ function render {
   renderer=$3
   case "$renderer" in
     slidy)
-      pandoc --self-contained -i -s -t slidy -V slidy-url=Slidy -o $dst $src
+      pandoc --self-contained -i -s -t slidy -V slidy-url=./html-slide-renderer/Slidy -o $dst $src
       ;;
     slidy2)
-      pandoc --self-contained -i -s -t slidy -V slidy-url=Slidy2 -o $dst $src
+      pandoc --self-contained -i -s -t slidy -V slidy-url=./html-slide-renderer/Slidy2 -o $dst $src
       ;;
     slideous)
-      pandoc --self-contained -i -s -t slidy -V slideous-url=slideous -o $dst $src
+      pandoc --self-contained -i -s -t slideous -V slideous-url=./html-slide-renderer/slideous -o $dst $src
       ;;
     revealjs)
-      pandoc --self-contained -i -s -t revealjs -V revealjs-url=reveal.js -V theme=solarized -o $dst $src
+      pandoc --self-contained -i -s -t revealjs -V revealjs-url=./html-slide-renderer/reveal.js -V theme=solarized -o $dst $src
       ;;
     dzslides)
       pandoc --self-contained -i -s -t dzslides -o $dst $src

@@ -1,7 +1,7 @@
 #!/usr/bin/env stack
 {- stack
   script
-  --resolver lts-11.8
+  --resolver lts-13.8
   --package attoparsec
   --package bytestring
   --package time
@@ -34,8 +34,18 @@ data LogEntry = LogEntry
 
 type Log = [LogEntry]
 
+
 parseIP :: Parser IP
-parseIP = undefined
+parseIP = do
+  d1 <- decimal
+  char '.'
+  d2 <- decimal
+  char '.'
+  d3 <- decimal
+  char '.'
+  d4 <- decimal
+  return $ IP d1 d2 d3 d4
+
 
 parseDay :: Parser Day
 parseDay = undefined
@@ -53,5 +63,12 @@ parseLog :: Parser Log
 parseLog = undefined
 
 
+ip = BC.pack "127.0.0.1"
+
+
 main :: IO ()
-main = return ()
+main = do
+  let parse_result = parseOnly parseIP ip
+  case parse_result of
+    Left err -> print err
+    Right res -> print res

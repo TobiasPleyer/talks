@@ -1,21 +1,24 @@
 #!/usr/bin/env stack
 {- stack
   script
-  --resolver lts-11.8
+  --resolver lts-13.8
   --package attoparsec
+  --package base
   --package bytestring
   --package time
 -}
 
 {-# LANGUAGE OverloadedStrings #-}
 
+import Data.Char (isAlpha, toLower)
 import Data.Word
 import Data.Time hiding (parseTime)
 import Data.Attoparsec.ByteString.Char8
 import Control.Applicative
-import Control.Monad
+import Control.Monad (forM_)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
+import System.Environment (getArgs)
 
 
 data IP = IP Word8 Word8 Word8 Word8 deriving Show
@@ -35,15 +38,23 @@ data LogEntry = LogEntry
 type Log = [LogEntry]
 
 
+word8 :: Parser Word8
+word8 = do
+  num <- decimal :: Parser Integer
+  if num < 256
+  then return (fromIntegral num)
+  else fail "Field must be in the range [0-255]."
+
+
 parseIP :: Parser IP
 parseIP = do
-  d1 <- decimal
+  d1 <- word8
   char '.'
-  d2 <- decimal
+  d2 <- word8
   char '.'
-  d3 <- decimal
+  d3 <- word8
   char '.'
-  d4 <- decimal
+  d4 <- word8
   return $ IP d1 d2 d3 d4
 
 
@@ -68,11 +79,14 @@ parseTime = do
 
 
 parseProduct :: Parser Product
-parseProduct =
-     (string "mouse"    >> return Mouse)
- <|> (string "keyboard" >> return Keyboard)
- <|> (string "monitor"  >> return Monitor)
- <|> (string "speakers" >> return Speakers)
+parseProduct = do
+  product <- map toLower <$> many (satisfy isAlpha)
+  case product of
+    "mouse" -> return Mouse
+    "keyboard" -> return Keyboard
+    "monitor" -> return Monitor
+    "speakers" -> return Speakers
+    _ -> fail ("Unknown product " ++ product)
 
 
 parseLogEntry :: Parser LogEntry
@@ -88,19 +102,23 @@ parseLogEntry = do
 
 
 parseLog :: Parser Log
-parseLog = undefined
-
-
-ip   = "127.0.0.1"
-day  = "2013-06-29"
-time = "12:52:17"
-prod = "monitor"
-entry = B.intercalate " " [day,time,ip,prod]
+parseLog = do
+  log <- many $ parseLogEntry <* endOfLine
+  end <- atEnd
+  if not end
+  then fail ("Error in line #" ++ show (length log + 1))
+  else return log
 
 
 main :: IO ()
 main = do
-  let parse_result = parseOnly parseLogEntry entry
+  logFile <- head <$> getArgs
+  log_content <- B.readFile logFile
+  -- Try to parse every line successfully or fail
+  let parse_result = parseOnly parseLog log_content
   case parse_result of
     Left err -> print err
-    Right res -> print res
+    Right logs -> forM_ logs print
+  -- Parse every line and continue on fail
+  let lineParses = map (parseOnly parseLogEntry) (BC.lines log_content)
+  forM_ lineParses print

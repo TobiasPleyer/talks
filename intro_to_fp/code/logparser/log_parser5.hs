@@ -1,7 +1,7 @@
 #!/usr/bin/env stack
 {- stack
   script
-  --resolver lts-11.8
+  --resolver lts-13.8
   --package attoparsec
   --package bytestring
   --package time
@@ -35,7 +35,7 @@ data LogEntry = LogEntry
 type Log = [LogEntry]
 
 
---parseIP :: Parser IP
+parseIP :: Parser IP
 parseIP = do
   d1 <- decimal
   char '.'
@@ -44,34 +44,48 @@ parseIP = do
   d3 <- decimal
   char '.'
   d4 <- decimal
-  return $ show $ IP d1 d2 d3 d4
+  return $ IP d1 d2 d3 d4
 
 
---parseDay :: Parser Day
+parseDay :: Parser Day
 parseDay = do
   y  <- count 4 digit
   char '-'
   mm <- count 2 digit
   char '-'
   d  <- count 2 digit
-  return $ show $ fromGregorian (read y) (read mm) (read d)
+  return $ fromGregorian (read y) (read mm) (read d)
 
 
---parseTime :: Parser TimeOfDay
+parseTime :: Parser TimeOfDay
 parseTime = do
   h  <- count 2 digit
   char ':'
   m  <- count 2 digit
   char ':'
   s  <- count 2 digit
-  return $ show $ TimeOfDay (read h) (read m) (read s)
+  return $ TimeOfDay (read h) (read m) (read s)
 
 
 parseProduct :: Parser Product
-parseProduct = undefined
+parseProduct =
+     (string "mouse"    >> return Mouse)
+ <|> (string "keyboard" >> return Keyboard)
+ <|> (string "monitor"  >> return Monitor)
+ <|> (string "speakers" >> return Speakers)
+
 
 parseLogEntry :: Parser LogEntry
-parseLogEntry = undefined
+parseLogEntry = do
+  d <- parseDay
+  char ' '
+  t <- parseTime
+  char ' '
+  ip <- parseIP
+  char ' '
+  p <- parseProduct
+  return $ LogEntry (LocalTime d t) ip p
+
 
 parseLog :: Parser Log
 parseLog = undefined
@@ -80,18 +94,13 @@ parseLog = undefined
 ip   = "127.0.0.1"
 day  = "2013-06-29"
 time = "12:52:17"
+prod = "monitor"
+entry = B.intercalate " " [day,time,ip,prod]
 
-
-testParser (p,bs) = do
-  let parse_result = parseOnly p bs
-  case parse_result of
-    Left err -> print err
-    Right res -> putStrLn res
 
 main :: IO ()
 main = do
-  let testPairs = [ (parseIP, ip)
-                  , (parseDay, day)
-                  , (parseTime, time)
-                  ]
-  forM_ testPairs testParser
+  let parse_result = parseOnly parseLogEntry entry
+  case parse_result of
+    Left err -> print err
+    Right res -> print res
