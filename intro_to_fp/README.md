@@ -13,6 +13,12 @@ Wer die HTML Folien auch produzieren möchte braucht auch noch das hier
 
     * pandoc (https://pandoc.org/)
 
+Wer den Vortrag in der Shell starten möchte braucht auch noch das hier
+
+    * patat (https://github.com/jaspervdj/patat)
+
+Der Quellcode für die Folien findet sich in der Datei `slides/intro_to_fp.md`.
+
 ## Kurze Erklärung zu stack
 
 *stack* ist ein Tool zur einfachen Erstellung von Projekten in der
