@@ -4,8 +4,10 @@ import qualified Data.ByteString as B
 import Test.Hspec
 import Test.Hspec.Attoparsec
 import Control.Exception (evaluate)
+import Test.QuickCheck
 
 import Lib
+import PropertyBased
 
 
 ok_ip    = "127.0.0.1"  :: B.ByteString
@@ -22,7 +24,9 @@ nok_entry = B.intercalate " " [nok_day,nok_time,nok_ip,nok_prod]
 
 
 main :: IO ()
-main = hspec spec
+main = do
+  hspec spec
+
 
 spec :: Spec
 spec = do

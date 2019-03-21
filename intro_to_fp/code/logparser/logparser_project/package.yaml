@@ -51,3 +51,4 @@ tests:
     - logparser
     - hspec
     - hspec-attoparsec
+    - QuickCheck

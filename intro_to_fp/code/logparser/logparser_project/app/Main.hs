@@ -7,7 +7,7 @@ import Lib
 
 main :: IO ()
 main = do
-  let logFile = "example.log"
+  let logFile = "../example.log"
   log_content <- B.readFile logFile
   let parse_result = parseOnly parseLog log_content
   case parse_result of
